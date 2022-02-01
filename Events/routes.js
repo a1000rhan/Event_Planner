@@ -6,13 +6,15 @@ const {
   createEvent,
   deleteEvent,
   updateEvent,
+  searchByName,
+  fullyBooked,
 } = require("./controller");
 
 routers.get("/", getEvents);
 
-//return one product based on id #
-routers.get("/:id", getDetail);
-
+routers.get("/full", fullyBooked);
+routers.get("/s/:slug", searchByName);
+routers.get("/d/:id", getDetail);
 routers.post("/", createEvent);
 routers.delete("/:id", deleteEvent);
 routers.put("/:id", updateEvent);

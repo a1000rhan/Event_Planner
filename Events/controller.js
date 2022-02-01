@@ -23,6 +23,33 @@ exports.getDetail = async (req, res) => {
   }
 };
 
+exports.fullyBooked = async (req, res) => {
+  try {
+    const oneEvent = await Event.find({
+      $expr: { $eq: ["$numOfSeats", "$bookedSeats"] },
+    });
+
+    res.json(oneEvent);
+
+    res.status(200).end();
+  } catch (e) {
+    res.status(500).json({ message: e.massage });
+  }
+};
+
+exports.searchByName = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const oneEvent = await Event.find({ slug: slug });
+
+    res.json(oneEvent);
+
+    res.status(200).end();
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+};
+
 exports.createEvent = async (req, res) => {
   console.log(req.body);
   try {

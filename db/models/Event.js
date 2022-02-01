@@ -2,23 +2,48 @@ const mongoose = require("mongoose");
 const mongooseSlugPlugin = require("mongoose-slug-plugin");
 
 const EventSchema = new mongoose.Schema({
-  organizer: { type: String, require: true },
-  name: { type: String, require: true },
+  organizer: { type: String, maxlength: 20, require: true, unique: true },
+  name: {
+    type: String,
+    require: true,
+    validate: [
+      function (value) {
+        return !value.includes("event");
+      },
+    ],
+  },
   email: {
     type: String,
     require: true,
-    lowercase: true,
+
     unique: true,
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
       "Please fill a valid email address",
     ],
   },
-  image: { type: String },
-  numOfSeats: { type: Number },
-  bookedSeats: { type: Number },
-  startDate: { type: Date, min: Date() },
-  endDate: { type: Date, min: Date() },
+  image: { type: String, require: true },
+  numOfSeats: { type: Number, max: 5 },
+  bookedSeats: {
+    type: Number,
+    default: 0,
+    max: this.numOfSeats,
+    validate: [
+      function (value) {
+        return this.numOfSeats >= value;
+      },
+    ],
+  },
+  startDate: { type: Date, min: Date() + 1 },
+  endDate: {
+    type: Date,
+    min: this.startDate,
+    validate: [
+      function (value) {
+        return value > this.startDate;
+      },
+    ],
+  },
 });
 EventSchema.plugin(mongooseSlugPlugin, { tmpl: "<%=name%>" });
 module.exports = mongoose.model("Event", EventSchema);
